@@ -1,6 +1,6 @@
 {
   "name": "redux-plus",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "redux",
   "main": "./lib/index.js",
   "types": "./src/index.ts",
@@ -13,6 +13,7 @@
     "typescript": "^3.3.3333"
   },
   "peerDependencies": {
+    "redux": "^4.0.0",
     "redux-form": "^7.4.2",
     "redux-observable": "^1.1.0",
     "rxjs": "^6.1.0",
