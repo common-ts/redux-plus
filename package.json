@@ -1,0 +1,32 @@
+{
+  "name": "redux-plus",
+  "version": "0.0.7",
+  "description": "redux",
+  "main": "./lib/index.js",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build:lib": "tsc",
+    "clean:lib": "rimraf lib"
+  },
+  "devDependencies": {
+    "tslint": "5.10.0",
+    "typescript": "^3.3.3333"
+  },
+  "peerDependencies": {
+    "redux-form": "^7.4.2",
+    "redux-observable": "^1.1.0",
+    "rxjs": "^6.1.0",
+    "rxjs-compat": "^6.1.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com/common-ts/redux"
+  },
+  "keywords": [
+    "redux",
+    "redux-plus"
+  ]
+}
