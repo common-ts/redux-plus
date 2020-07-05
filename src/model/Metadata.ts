@@ -1,5 +1,5 @@
 export interface Metadata {
-  name: string;
+  name?: string;
   attributes: any;
   source?: string;
 }
