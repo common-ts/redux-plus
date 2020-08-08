@@ -1,18 +1,9 @@
 export interface SearchModel {
-  keyword: string;
-  sortField: string;
-  sortType: string;
-  pageIndex: number;
-  pageSize: number;
-  initPageSize: number;
-  fields: string[];
-  excluding: any;
+  limit: number;
 }
 
 export interface SearchResult<T> {
-  itemTotal: number;
   results: T[];
-  lastPage: boolean;
 }
 
 export interface ReduxSearchCallback<T, S extends SearchModel> {

@@ -16,9 +16,8 @@ export interface ViewActionType {
 
 export interface ViewService<T, ID> {
   metadata(): Metadata;
-  ids(): string[];
-  all(): Promise<T[]>;
-  load(id: ID): Promise<T>;
+  keys(): string[];
+  load(id: ID, ctx?: any): Promise<T>;
 }
 
 export class ViewObservableEpics<T, ID> {
@@ -56,10 +55,9 @@ export interface GenericActionType extends ViewActionType {
 }
 
 export interface GenericService<T, ID, R> extends ViewService<T, ID> {
-  patch(obj: T, body: any): Promise<R>;
-  insert(obj: T): Promise<R>;
-  update(obj: T): Promise<R>;
-  delete?(id: ID): Promise<number>;
+  insert(obj: T, ctx?: any): Promise<R>;
+  update(obj: T, ctx?: any): Promise<R>;
+  patch?(obj: T, ctx?: any): Promise<R>;
 }
 
 export class GenericObservableEpics<T, ID, R> extends ViewObservableEpics<T, ID> {
@@ -218,7 +216,7 @@ export interface DiffActionType {
 }
 
 export interface DiffService<T, ID> {
-  ids(): string[];
+  keys(): string[];
   diff(id: ID): Promise<DiffModel<T, ID>>;
 }
 
@@ -235,8 +233,12 @@ export class DiffObservableEpics<T, ID> {
         const {execute, handleError, formatData} = callback;
         return fromPromise(this.service.diff(parameter)).pipe(
           map((res: DiffModel<T, ID>) => {
-            const formatedRes = formatData(res);
-            execute(formatedRes);
+            if (!res) {
+              execute(null);
+            } else {
+              const formatedRes = formatData(res);
+              execute(formatedRes);
+            }
             return ({
               type: BaseActionType.ACTION_SUCCESS
             });
@@ -258,10 +260,10 @@ export interface ApprActionType {
 }
 
 export enum Status {
-  DataNotFound = 0,
+  NotFound = 0,
   Success = 1,
-  Error = 2,
-  DataVersionError = 4,
+  VersionError = 2,
+  Error = 4
 }
 
 export interface ApprService<ID> {
