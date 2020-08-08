@@ -13,7 +13,7 @@ export interface DiffActionType {
 }
 
 export interface DiffService<T, ID> {
-  ids(): string[];
+  keys(): string[];
   diff(id: ID): Promise<DiffModel<T, ID>>;
 }
 
@@ -30,8 +30,12 @@ export class DiffObservableEpics<T, ID> {
         const {execute, handleError, formatData} = callback;
         return fromPromise(this.service.diff(parameter)).pipe(
           map((res: DiffModel<T, ID>) => {
-            const formatedRes = formatData(res);
-            execute(formatedRes);
+            if (!res) {
+              execute(null);
+            } else {
+              const formatedRes = formatData(res);
+              execute(formatedRes);
+            }
             return ({
               type: BaseActionType.ACTION_SUCCESS
             });

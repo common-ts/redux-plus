@@ -14,9 +14,8 @@ export interface ViewActionType {
 
 export interface ViewService<T, ID> {
   metadata(): Metadata;
-  ids(): string[];
-  all(): Promise<T[]>;
-  load(id: ID): Promise<T>;
+  keys(): string[];
+  load(id: ID, ctx?: any): Promise<T>;
 }
 
 export class ViewObservableEpics<T, ID> {

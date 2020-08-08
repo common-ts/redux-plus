@@ -39,7 +39,7 @@ export class GenericSearchDiffApprObservableEpics<T, ID, R, S extends SearchMode
         const { parameter, callback } = action.payload;
         const { execute, handleError } = callback;
         return fromPromise(this.service.approve(parameter)).pipe(
-          map(status => {
+          map((status: Status) => {
             execute(status);
             return ({
               type: BaseActionType.ACTION_SUCCESS

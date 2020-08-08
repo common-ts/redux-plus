@@ -13,10 +13,10 @@ export interface ApprActionType {
 }
 
 export enum Status {
-  DataNotFound = 0,
+  NotFound = 0,
   Success = 1,
-  Error = 2,
-  DataVersionError = 4,
+  VersionError = 2,
+  Error = 4
 }
 
 export interface ApprService<ID> {
@@ -37,7 +37,7 @@ export class ApprObservableEpics<ID> {
         const { parameter, callback } = action.payload;
         const { execute, handleError } = callback;
         return fromPromise(this.service.approve(parameter)).pipe(
-          map(status => {
+          map((status: Status) => {
             execute(status);
             return ({
               type: BaseActionType.ACTION_SUCCESS

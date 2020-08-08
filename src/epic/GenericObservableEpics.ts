@@ -14,10 +14,9 @@ export interface GenericActionType extends ViewActionType {
 }
 
 export interface GenericService<T, ID, R> extends ViewService<T, ID> {
-  patch(obj: T, body: any): Promise<R>;
-  insert(obj: T): Promise<R>;
-  update(obj: T): Promise<R>;
-  delete?(id: ID): Promise<number>;
+  insert(obj: T, ctx?: any): Promise<R>;
+  update(obj: T, ctx?: any): Promise<R>;
+  patch?(obj: T, ctx?: any): Promise<R>;
 }
 
 export class GenericObservableEpics<T, ID, R> extends ViewObservableEpics<T, ID> {

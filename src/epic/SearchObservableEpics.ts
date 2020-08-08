@@ -27,7 +27,7 @@ export class SearchObservableEpics<T, S extends SearchModel> {
       flatMap((action: ReducerModel<ReduxSearchModel<T, S>, SearchActionType>) => {
         const { searchModel: searchModel, callback } = action.payload;
         return fromPromise(this.searchService.search(searchModel)).pipe(
-          map((list) => {
+          map((list: SearchResult<T>) => {
             callback.showResults(searchModel, list);
             return ({
               type: BaseActionType.ACTION_SUCCESS
