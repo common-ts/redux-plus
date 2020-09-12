@@ -29,9 +29,9 @@ export class ViewObservableEpics<T, ID> {
     return action$.pipe(
       ofType(this.viewActionType.getByIdType),
       flatMap((action: ReducerModel<ReduxModel<any, T>, ViewActionType>) => {
-        const { parameter, callback } = action.payload;
+        const { parameter, ctx, callback } = action.payload;
         const { execute, handleError } = callback;
-        return fromPromise(this.viewService.load(parameter)).pipe(
+        return fromPromise(this.viewService.load(parameter, ctx)).pipe(
           map((res: T) => {
             execute(res);
             return ({
@@ -72,9 +72,9 @@ export class GenericObservableEpics<T, ID, R> extends ViewObservableEpics<T, ID>
   // update = action$ => action$.pipe(
       ofType(this.genericActionType.updateType),
       flatMap((action: ReducerModel<ReduxModel<T, R>, GenericActionType>) => {
-        const { parameter, callback } = action.payload;
+        const { parameter, ctx, callback } = action.payload;
         const { execute, handleError } = callback;
-        return fromPromise(this.genericService.update(parameter)).pipe(
+        return fromPromise(this.genericService.update(parameter, ctx)).pipe(
           map((res: R) => {
             execute(res);
             return ({
@@ -94,9 +94,9 @@ export class GenericObservableEpics<T, ID, R> extends ViewObservableEpics<T, ID>
     return action$.pipe(
       ofType(this.genericActionType.insertType),
       flatMap((action: ReducerModel<ReduxModel<T, R>, GenericActionType>) => {
-        const { parameter, callback } = action.payload;
+        const { parameter, ctx, callback } = action.payload;
         const { execute, handleError } = callback;
-        return fromPromise(this.genericService.insert(parameter)).pipe(
+        return fromPromise(this.genericService.insert(parameter, ctx)).pipe(
           map((res: R) => {
             execute(res);
             return ({
@@ -117,9 +117,9 @@ export class GenericObservableEpics<T, ID, R> extends ViewObservableEpics<T, ID>
     return action$.pipe(
       ofType(this.genericActionType.insertType),
       flatMap((action: ReducerModel<ReduxModel<T, R>, GenericActionType>) => {
-        const { parameter, body, callback } = action.payload;
+        const { parameter, ctx, callback } = action.payload;
         const { execute, handleError } = callback;
-        return fromPromise(this.genericService.patch(parameter, body)).pipe(
+        return fromPromise(this.genericService.patch(parameter, ctx)).pipe(
           map((res: R) => {
             execute(res);
             return ({
@@ -140,9 +140,8 @@ export class GenericObservableEpics<T, ID, R> extends ViewObservableEpics<T, ID>
 export interface SearchActionType {
   searchType: string;
 }
-
 export interface SearchService<T, S extends SearchModel> {
-  search(s: S): Promise<SearchResult<T>>;
+  search(s: S, ctx?: any): Promise<SearchResult<T>>;
 }
 
 export class SearchObservableEpics<T, S extends SearchModel> {
@@ -155,8 +154,8 @@ export class SearchObservableEpics<T, S extends SearchModel> {
     return action$.pipe(
       ofType(this.searchActionType.searchType),
       flatMap((action: ReducerModel<ReduxSearchModel<T, S>, SearchActionType>) => {
-        const { searchModel: searchModel, callback } = action.payload;
-        return fromPromise(this.searchService.search(searchModel)).pipe(
+        const { searchModel, ctx, callback } = action.payload;
+        return fromPromise(this.searchService.search(searchModel, ctx)).pipe(
           map((list: SearchResult<T>) => {
             callback.showResults(searchModel, list);
             return ({
@@ -171,9 +170,7 @@ export class SearchObservableEpics<T, S extends SearchModel> {
 }
 
 export interface ViewSearchActionType extends ViewActionType, SearchActionType {
-
 }
-
 export interface ViewSearchService<T, ID, S extends SearchModel>
   extends ViewService<T, ID>, SearchService<T, S> {
 }
@@ -191,9 +188,7 @@ export class ViewSearchObservableEpics<T, ID, R, S extends SearchModel> extends 
 }
 
 export interface GenericSearchActionType extends GenericActionType, SearchActionType {
-
 }
-
 export interface GenericSearchService<T, ID, R, S extends SearchModel>
   extends GenericService<T, ID, R>, SearchService<T, S> {
 }
@@ -210,14 +205,12 @@ export class GenericSearchObservableEpics<T, ID, R, S extends SearchModel> exten
   }
 }
 
-
 export interface DiffActionType {
   diff: string;
 }
-
 export interface DiffService<T, ID> {
   keys(): string[];
-  diff(id: ID): Promise<DiffModel<T, ID>>;
+  diff(id: ID, ctx?: any): Promise<DiffModel<T, ID>>;
 }
 
 export class DiffObservableEpics<T, ID> {
@@ -228,10 +221,10 @@ export class DiffObservableEpics<T, ID> {
   // public diff = action$ => action$.pipe(
     return action$.pipe(
       ofType(this.actionType.diff),
-      flatMap((action: ReducerModel<ReduxModel<any, DiffModel<T, ID>>, DiffActionType>) => {
-        const { parameter, callback } = action.payload;
+      flatMap((action: ReducerModel<ReduxModel<ID, DiffModel<T, ID>>, DiffActionType>) => {
+        const { parameter, ctx, callback } = action.payload;
         const {execute, handleError, formatData} = callback;
-        return fromPromise(this.service.diff(parameter)).pipe(
+        return fromPromise(this.service.diff(parameter, ctx)).pipe(
           map((res: DiffModel<T, ID>) => {
             if (!res) {
               execute(null);
@@ -258,17 +251,15 @@ export interface ApprActionType {
   approveType: string;
   rejectType: string;
 }
-
 export enum Status {
   NotFound = 0,
   Success = 1,
   VersionError = 2,
   Error = 4
 }
-
 export interface ApprService<ID> {
-  approve(id: ID): Promise<Status>;
-  reject(id: ID): Promise<Status>;
+  approve(id: ID, ctx?: any): Promise<Status>;
+  reject(id: ID, ctx?: any): Promise<Status>;
 }
 
 export class ApprObservableEpics<ID> {
@@ -280,10 +271,10 @@ export class ApprObservableEpics<ID> {
   approve(action$: ActionsObservable<any>): Observable<ReducerActionType<string>> {
     return action$.pipe(
       ofType(this.actionType.approveType),
-      flatMap((action: ReducerModel<ReduxModel<any, Status>, ApprActionType>) => {
-        const { parameter, callback } = action.payload;
+      flatMap((action: ReducerModel<ReduxModel<ID, Status>, ApprActionType>) => {
+        const { parameter, ctx, callback } = action.payload;
         const { execute, handleError } = callback;
-        return fromPromise(this.service.approve(parameter)).pipe(
+        return fromPromise(this.service.approve(parameter, ctx)).pipe(
           map((status: Status) => {
             execute(status);
             return ({
@@ -304,9 +295,9 @@ export class ApprObservableEpics<ID> {
     return action$.pipe(
       ofType(this.actionType.rejectType),
       flatMap((action: any) => {
-        const { parameter, callback } = action.payload;
+        const { parameter, ctx, callback } = action.payload;
         const { execute, handleError } = callback;
-        return fromPromise(this.service.reject(parameter)).pipe(
+        return fromPromise(this.service.reject(parameter, ctx)).pipe(
           map((res) => {
             execute(true);
             return ({
@@ -326,11 +317,8 @@ export class ApprObservableEpics<ID> {
 }
 
 export interface DiffApprActionType extends DiffActionType, ApprActionType {
-
 }
-
 export interface DiffApprService<T, ID> extends DiffService<T, ID>, ApprService<ID> {
-
 }
 
 export class DiffApprObservableEpics<T, ID> extends ApprObservableEpics<ID> {
@@ -345,13 +333,9 @@ export class DiffApprObservableEpics<T, ID> extends ApprObservableEpics<ID> {
   }
 }
 
-
 export interface GenericSearchDiffApprActionType extends GenericSearchActionType, DiffApprActionType {
-
 }
-
 export interface GenericSearchDiffApprService<T, ID, R, S extends SearchModel> extends GenericSearchService<T, ID, R, S>, DiffApprService<T, ID> {
-
 }
 
 export class GenericSearchDiffApprObservableEpics<T, ID, R, S extends SearchModel> extends GenericSearchObservableEpics<T, ID, R, S> {
@@ -368,49 +352,10 @@ export class GenericSearchDiffApprObservableEpics<T, ID, R, S extends SearchMode
   }
 
   approve(action$: ActionsObservable<any>): Observable<ReducerActionType<string>> {
-    return action$.pipe(
-      ofType(this.actionType.approveType),
-      flatMap((action: ReducerModel<ReduxModel<any, Status>, GenericSearchDiffApprActionType>) => {
-        const { parameter, callback } = action.payload;
-        const { execute, handleError } = callback;
-        return fromPromise(this.service.approve(parameter)).pipe(
-          map((status: Status) => {
-            execute(status);
-            return ({
-              type: BaseActionType.ACTION_SUCCESS
-            });
-          }),
-          catchError(err => {
-            // execute(StatusCode.Error, err);
-            handleError(err);
-            return null;
-          })
-        );
-      })
-    );
+    return this.diffObservableEpics.approve(action$);
   }
 
   reject(action$: ActionsObservable<any>): Observable<ReducerActionType<string>> {
-    return action$.pipe(
-      ofType(this.actionType.rejectType),
-      flatMap((action: any) => {
-        const { parameter, callback } = action.payload;
-        const { execute, handleError } = callback;
-        return fromPromise(this.service.reject(parameter)).pipe(
-          map((res) => {
-            execute(true);
-            return ({
-              type: BaseActionType.ACTION_SUCCESS
-            });
-          }),
-          // catchError((error) => handleError(error))
-          catchError((error) => {
-            execute(false, error);
-            handleError(error);
-            return null;
-          })
-        );
-      })
-    );
+    return this.diffObservableEpics.reject(action$);
   }
 }

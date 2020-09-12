@@ -13,5 +13,6 @@ export interface ReduxSearchCallback<T, S extends SearchModel> {
 
 export interface ReduxSearchModel<T, S extends SearchModel> {
   searchModel: S;
+  ctx?: any;
   callback: ReduxSearchCallback<T, S>;
 }
